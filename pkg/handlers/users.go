@@ -10,21 +10,6 @@ import (
 	"strconv"
 )
 
-//func (h *handler) GetOneUser(c *gin.Context) {
-//	var user models.User
-//	err := h.DB.Where("login = ?", c.Param("login")).
-//		Preload("Profile").
-//		Preload("Posts.Files").
-//		First(&user).Error
-//	if err != nil {
-//		log.Println("getting a user:", err)
-//		c.JSON(http.StatusNotFound, gin.H{
-//			"message": "no such user",
-//		})
-//		return
-//	}
-//}
-
 func (h *handler) GetAllUsers(c *gin.Context) {
 	var users []models.User
 	if err := h.DB.Find(&users).Error; err != nil {
@@ -73,50 +58,10 @@ func (h *handler) GetUserByLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-//func (h *handler) ReplenishUserMoney(c *gin.Context) {
-//	login := c.Param("login")
-//	replenishStr := c.Param("replenish")
-//
-//	// Преобразуйте значение replenishStr в тип int
-//	replenish, err := strconv.Atoi(replenishStr)
-//	if err != nil {
-//		log.Println("failed to convert replenish amount:", err)
-//		c.JSON(http.StatusBadRequest, gin.H{
-//			"message": "Invalid replenish amount",
-//		})
-//		return
-//	}
-//
-//	// Проверьте наличие пользователя с указанным логином
-//	var user models.User
-//	if err := h.DB.Preload("Cell").First(&user, "login = ?", login).Error; err != nil {
-//		log.Println("failed to find user:", err)
-//		c.JSON(http.StatusNotFound, gin.H{
-//			"message": "User not found",
-//		})
-//		return
-//	}
-//
-//	// Обновите значение поля money в таблице cells
-//	user.Cell.Money += replenish
-//	if err := h.DB.Save(&user.Cell).Error; err != nil {
-//		log.Println("failed to update cell money:", err)
-//		c.JSON(http.StatusInternalServerError, gin.H{
-//			"message": "Failed to update cell money",
-//		})
-//		return
-//	}
-//
-//	c.JSON(http.StatusOK, gin.H{
-//		"message": "User's account replenished",
-//	})
-//}
-
 func (h *handler) ReplenishUserMoney(c *gin.Context) {
 	login := c.Param("login")
 	replenishStr := c.Param("replenish")
 
-	// Преобразуйте значение replenishStr в тип int
 	replenish, err := strconv.Atoi(replenishStr)
 	if err != nil {
 		log.Println("failed to convert replenish amount:", err)
@@ -126,7 +71,6 @@ func (h *handler) ReplenishUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Проверьте наличие пользователя с указанным логином
 	var user models.User
 	if err := h.DB.Preload("Cell").First(&user, "login = ?", login).Error; err != nil {
 		log.Println("failed to find user:", err)
@@ -136,7 +80,6 @@ func (h *handler) ReplenishUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Убедитесь, что у пользователя есть хотя бы одна ячейка
 	if len(user.Cell) == 0 {
 		log.Println("user has no cell")
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -145,7 +88,6 @@ func (h *handler) ReplenishUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Обновите значение поля money в ячейке пользователя
 	user.Cell[0].Money += replenish
 	if err := h.DB.Save(&user.Cell[0]).Error; err != nil {
 		log.Println("failed to update cell money:", err)
@@ -164,7 +106,6 @@ func (h *handler) WithdrawUserMoney(c *gin.Context) {
 	login := c.Param("login")
 	withdrawStr := c.Param("withdraw")
 
-	// Преобразуйте значение replenishStr в тип int
 	withdraw, err := strconv.Atoi(withdrawStr)
 	if err != nil {
 		log.Println("failed to convert withdraw amount:", err)
@@ -174,7 +115,6 @@ func (h *handler) WithdrawUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Проверьте наличие пользователя с указанным логином
 	var user models.User
 	if err := h.DB.Preload("Cell").First(&user, "login = ?", login).Error; err != nil {
 		log.Println("failed to find user:", err)
@@ -184,7 +124,6 @@ func (h *handler) WithdrawUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Убедитесь, что у пользователя есть хотя бы одна ячейка
 	if len(user.Cell) == 0 {
 		log.Println("user has no cell")
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -201,7 +140,6 @@ func (h *handler) WithdrawUserMoney(c *gin.Context) {
 		return
 	}
 
-	// Обновите значение поля money в ячейке пользователя
 	user.Cell[0].Money -= withdraw
 	if err := h.DB.Save(&user.Cell[0]).Error; err != nil {
 		log.Println("failed to update cell money:", err)
